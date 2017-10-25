@@ -274,8 +274,9 @@ function packageTask(platform, arch, opts) {
 			.pipe(json({ name, version }));
 
 		const date = new Date().toISOString();
+		const buildNumber = getBuildNumber();
 		const productJsonStream = gulp.src(['product.json'], { base: '.' })
-			.pipe(json({ commit, date, checksums }));
+			.pipe(json({ commit, date, checksums, buildNumber }));
 
 		const license = gulp.src(['LICENSES.chromium.html', 'LICENSE.txt', 'ThirdPartyNotices.txt', 'licenses/**'], { base: '.' });
 
@@ -465,9 +466,38 @@ gulp.task('upload-vscode-configuration', ['generate-vscode-configuration'], () =
 			account: process.env.AZURE_STORAGE_ACCOUNT,
 			key: process.env.AZURE_STORAGE_ACCESS_KEY,
 			container: 'configuration',
-			prefix: `${versionStringToNumber(packageJson.version)}/${commit}/`
+			prefix: `${getBuildNumber()}/${commit}/`
 		}));
 });
+
+function getBuildNumber() {
+	const previous = getPreviousVersion(packageJson.version);
+	try {
+		const out = cp.execSync(`git rev-list ${previous}..HEAD --count`);
+		const count = parseInt(out);
+		return versionStringToNumber(packageJson.version) * 1e4 + count;
+	} catch (e) {
+		console.error('Could not determine build number: ' + e.toString());
+		return 0;
+	}
+}
+
+/**
+ * Given 1.17.2, return 1.17.1
+ * 1.18.0 => 1.17.0. Etc.
+ */
+function getPreviousVersion(versionStr) {
+	const semverArr = versionStr.split('.');
+	if (semverArr[2] > 0) {
+		semverArr[2]--;
+	} else if (semverArr[1] > 0) {
+		semverArr[1]--;
+	} else {
+		semverArr[0]--;
+	}
+
+	return semverArr.join('.');
+}
 
 function versionStringToNumber(versionStr) {
 	const semverRegex = /(\d+)\.(\d+)\.(\d+)/;
@@ -476,7 +506,7 @@ function versionStringToNumber(versionStr) {
 		return 0;
 	}
 
-	return parseInt(match[1], 10) * 10000 + parseInt(match[2], 10) * 100 + parseInt(match[3], 10);
+	return parseInt(match[1], 10) * 1e4 + parseInt(match[2], 10) * 1e2 + parseInt(match[3], 10);
 }
 
 gulp.task('generate-vscode-configuration', () => {
