@@ -264,7 +264,11 @@ export class CollapseAction extends Action {
 				return TPromise.as(null); // Global action disabled if user is in edit mode from another action
 			}
 
-			viewer.collapseAll();
+			viewer.collapseToDepth(2).then(hadExpandedFiles => {
+				if (!hadExpandedFiles) {
+					viewer.collapseAll();
+				}
+			});
 			viewer.clearSelection();
 			viewer.clearFocus();
 			viewer.DOMFocus();

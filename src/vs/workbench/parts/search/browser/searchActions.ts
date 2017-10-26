@@ -10,7 +10,8 @@ import resources = require('vs/base/common/resources');
 import { TPromise } from 'vs/base/common/winjs.base';
 import URI from 'vs/base/common/uri';
 import { Action } from 'vs/base/common/actions';
-import { ToggleViewletAction } from 'vs/workbench/browser/viewlet';
+import { ToggleViewletAction, CollapseAction as TreeCollapseAction } from 'vs/workbench/browser/viewlet';
+// import { ToggleViewletAction } from 'vs/workbench/browser/viewlet';
 import { IViewletService } from 'vs/workbench/services/viewlet/browser/viewlet';
 import { ITree } from 'vs/base/parts/tree/browser/tree';
 import { INavigator } from 'vs/base/common/iterator';
@@ -18,7 +19,6 @@ import { SearchViewlet } from 'vs/workbench/parts/search/browser/searchViewlet';
 import { Match, FileMatch, FileMatchOrMatch, FolderMatch, RenderableMatch } from 'vs/workbench/parts/search/common/searchModel';
 import { IReplaceService } from 'vs/workbench/parts/search/common/replace';
 import * as Constants from 'vs/workbench/parts/search/common/constants';
-import { CollapseAllAction as TreeCollapseAction } from 'vs/base/parts/tree/browser/treeDefaults';
 import { IWorkbenchEditorService } from 'vs/workbench/services/editor/common/editorService';
 import { ITelemetryService } from 'vs/platform/telemetry/common/telemetry';
 import { ResolvedKeybinding, createKeybinding } from 'vs/base/common/keyCodes';
@@ -407,8 +407,7 @@ export class RefreshAction extends Action {
 export class CollapseAllAction extends TreeCollapseAction {
 
 	constructor(viewlet: SearchViewlet) {
-		super(viewlet.getControl(), false);
-		this.class = 'search-action collapse';
+		super(viewlet.getControl(), false, 'search-action collapse');
 	}
 }
 

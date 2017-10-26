@@ -64,6 +64,8 @@ import { getOutOfWorkspaceEditorResources } from 'vs/workbench/parts/search/comm
 import { PreferencesEditor } from 'vs/workbench/parts/preferences/browser/preferencesEditor';
 import { SimpleFileResourceDragAndDrop } from 'vs/base/parts/tree/browser/treeDnd';
 
+const collapseAllId = 'workbench.action.collapse';
+
 export class SearchViewlet extends Viewlet {
 
 	private static MAX_TEXT_RESULTS = 10000;
@@ -1077,7 +1079,7 @@ export class SearchViewlet extends Viewlet {
 			this.loading = false;
 
 			this.actionRegistry['refresh'].enabled = true;
-			this.actionRegistry['vs.tree.collapse'].enabled = hasResults;
+			this.actionRegistry[collapseAllId].enabled = hasResults;
 			this.actionRegistry['clearSearchResults'].enabled = hasResults;
 
 			if (completed && completed.limitHit) {
@@ -1252,8 +1254,8 @@ export class SearchViewlet extends Viewlet {
 			}
 			if (fileCount > 0) {
 				// since we have results now, enable some actions
-				if (!this.actionRegistry['vs.tree.collapse'].enabled) {
-					this.actionRegistry['vs.tree.collapse'].enabled = true;
+				if (!this.actionRegistry[collapseAllId].enabled) {
+					this.actionRegistry[collapseAllId].enabled = true;
 				}
 			}
 		}, 100);
@@ -1315,7 +1317,7 @@ export class SearchViewlet extends Viewlet {
 
 		// disable 'result'-actions
 		this.actionRegistry['refresh'].enabled = false;
-		this.actionRegistry['vs.tree.collapse'].enabled = false;
+		this.actionRegistry[collapseAllId].enabled = false;
 		this.actionRegistry['clearSearchResults'].enabled = false;
 
 		// clean up ui
@@ -1422,7 +1424,7 @@ export class SearchViewlet extends Viewlet {
 	public getActions(): IAction[] {
 		return [
 			this.actionRegistry['refresh'],
-			this.actionRegistry['vs.tree.collapse'],
+			this.actionRegistry[collapseAllId],
 			this.actionRegistry['clearSearchResults']
 		];
 	}

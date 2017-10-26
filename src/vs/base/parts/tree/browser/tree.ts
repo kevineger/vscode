@@ -95,6 +95,13 @@ export interface ITree extends Events.IEventEmitter {
 	collapse(element: any, recursive?: boolean): WinJS.Promise;
 
 	/**
+	 * Collapses all elements at the specified depth.
+	 * Provide no elements and it will recursively collapse all elements in the tree
+	 * The returned promise returns a boolean for whether any elements at the depth were collapsed or not.
+	 */
+	collapseToDepth(depth: number, elements?: any[]): WinJS.Promise;
+
+	/**
 	 * Collapses several elements.
 	 * Provide no arguments and it will recursively collapse all elements in the tree
 	 * The returned promise returns a boolean for whether the elements were collapsed or not.

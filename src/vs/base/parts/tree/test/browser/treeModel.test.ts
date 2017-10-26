@@ -684,6 +684,19 @@ suite('TreeModel - Expansion', () => {
 		});
 	});
 
+	test('top level collapsed from depth', (done) => {
+		model.setInput(SAMPLE.AB).done(() => {
+
+			model.collapseToDepth(2);
+
+			var nav = model.getNavigator();
+			assert.equal(nav.next().id, 'a');
+			assert.equal(nav.next().id, 'b');
+			assert.equal(nav.next().id, 'c');
+			done();
+		});
+	});
+
 	test('top level collapsed', (done) => {
 		model.setInput(SAMPLE.AB).done(() => {
 

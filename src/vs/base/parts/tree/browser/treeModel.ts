@@ -546,7 +546,7 @@ export class Item extends Events.EventEmitter {
 		item.depth = null;
 	}
 
-	private forEachChild(fn: (child: Item) => void): void {
+	public forEachChild(fn: (child: Item) => void): void {
 		var child = this.firstChild, next: Item;
 		while (child) {
 			next = child.next;
@@ -882,15 +882,46 @@ export class TreeModel extends Events.EventEmitter {
 		return item.collapse(recursive);
 	}
 
+	public collapseToDepth(depth: number, elements: any[] = null): WinJS.Promise {
+		if (!elements) {
+			elements = [this.input];
+		}
+		var promises = [];
+		for (var i = 0, len = elements.length; i < len; i++) {
+			var item = this.getItem(elements[i]);
+			if (!item) {
+				return WinJS.TPromise.as(false);
+			}
+			// If the item is a "result" node, collapse it.
+			if (item.getDepth() === depth && item.isExpanded) {
+				promises.push(item.collapse());
+			} else {
+				item.forEachChild((child) => {
+					if (item.isExpanded) {
+						promises.push(this.collapseToDepth(depth, [child]));
+					} else {
+						promises.push(WinJS.TPromise.as(false));
+					}
+				});
+			}
+		}
+
+		return WinJS.Promise.join(promises).then(results => {
+			return results.some(res => res);
+		});
+	}
+
 	public collapseAll(elements: any[] = null, recursive: boolean = false): WinJS.Promise {
 		if (!elements) {
 			elements = [this.input];
 			recursive = true;
 		}
+
 		var promises = [];
 		for (var i = 0, len = elements.length; i < len; i++) {
 			promises.push(this.collapse(elements[i], recursive));
 		}
+
 		return WinJS.Promise.join(promises);
 	}
 
